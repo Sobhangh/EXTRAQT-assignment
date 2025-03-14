@@ -1,16 +1,16 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient,HttpClientModule } from '@angular/common/http';
 import { RouterOutlet } from '@angular/router';
 //import { GoogleMap, GoogleMapsModule } from '@angular/google-maps';
 import * as L from 'leaflet';
-import {Country, GeoJsonType} from './country';
+import {Country} from './country';
 import * as GeoJSON from 'geojson';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, HttpClientModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -21,7 +21,7 @@ export class AppComponent  implements OnInit {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef;
   private map!: L.Map;
 
-  constructor() {} //private http: HttpClient
+  constructor(private http: HttpClient) {} //
   
 
   ngOnInit() {
@@ -38,8 +38,9 @@ export class AppComponent  implements OnInit {
   }
 
   private loadCountryDataFromBackend() {
-    /*this.http.get<Country[]>('http://your-backend.com/api/countries').subscribe((data) => {
+    this.http.get<Country[]>('http://localhost:8080/get-countries').subscribe((data) => {
       data.forEach((country) => {
+        console.log(country);
         const geoJsonFeature : GeoJSON.Feature   = {
           type: 'Feature',
           properties: {
@@ -47,8 +48,8 @@ export class AppComponent  implements OnInit {
             code: country.code,
           },
           geometry: {
-            type: 'Polygon',
-            coordinates: country.coordinates, // GeoJSON expects nested arrays
+            type: 'MultiPolygon',
+            coordinates: country.multipolygon, // GeoJSON expects nested arrays
           },
         };
 
@@ -65,7 +66,7 @@ export class AppComponent  implements OnInit {
           },
         }).addTo(this.map);
       });
-    });*/
+    });
   }
   /*
   @ViewChild('google-map') map: GoogleMap = new GoogleMap();
