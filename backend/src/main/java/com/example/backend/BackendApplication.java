@@ -11,6 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.yaml.snakeyaml.util.Tuple;
 
 import java.nio.file.Files;
@@ -32,6 +33,11 @@ public class BackendApplication {
 	@Bean
 	public List<Country> countries() {
 		return new ArrayList<Country>(); // Initialize with empty data
+	}
+
+	@Bean
+	public WebClient webClient() {
+		return WebClient.builder().baseUrl("https://hellosalut.stefanbohacek.dev").build();
 	}
 
 	@Bean
