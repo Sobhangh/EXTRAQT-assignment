@@ -1,7 +1,10 @@
 package com.example.backend.controller;
 
+import com.example.backend.BackendApplication;
 import com.example.backend.model.Country;
 import com.example.backend.model.HelloResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
@@ -22,6 +25,8 @@ import java.util.List;
 @RestController
 public class Controller {
 
+    private static Logger logger = LoggerFactory.getLogger(Controller.class);
+
     @Autowired
     private List<Country> countryList;
 
@@ -35,6 +40,7 @@ public class Controller {
     }
 
     // GET endpoint to fetch country data
+    @CrossOrigin("http://localhost:4200")
     @GetMapping("/translate-hello")
     public ResponseEntity<String> translateHello(@RequestParam String cc) {
         try {
@@ -44,6 +50,8 @@ public class Controller {
 
         } catch (Exception e) {
             // Catch any exceptions and return a 500 status
+            logger.info("Error...");
+            logger.info(String.valueOf(e));
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -51,7 +59,7 @@ public class Controller {
     // Service method to fetch country data from external API
     private Mono<HelloResponse> getCountryData(String countryCode) {
         return webClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/country-info")
+                .uri(uriBuilder -> uriBuilder
                         .queryParam("cc", countryCode)
                         .build())
                 .retrieve()
