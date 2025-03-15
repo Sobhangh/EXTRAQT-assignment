@@ -102,7 +102,7 @@ public class BackendApplication {
 
 			for (String ringText : rings) {
 				List<List<Double>> ring = new ArrayList<>();
-				Pattern coordPattern = Pattern.compile("(\\d+\\.\\d+)\\s+(\\d+\\.\\d+)");
+				Pattern coordPattern = Pattern.compile("([-]?\\d+\\.\\d+)\\s+(\\d+\\.\\d+)");
 				Matcher coordMatcher = coordPattern.matcher(ringText);
 
 				while (coordMatcher.find()) {

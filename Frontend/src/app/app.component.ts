@@ -6,6 +6,7 @@ import { RouterOutlet } from '@angular/router';
 import * as L from 'leaflet';
 import {Country} from './country';
 import * as GeoJSON from 'geojson';
+import proj4 from 'proj4';
 
 @Component({
   selector: 'app-root',
@@ -57,61 +58,27 @@ export class AppComponent  implements OnInit {
           style: (feature) => {
             //const code = feature?.properties?.code;
             //return { color: code === 'BE' ? 'blue' : code === 'FR' ? 'red' : 'gray' };
-            return {color:'green'};
+            return {color:'blue'};
           },
-          onEachFeature: (feature: { properties: { name: any; }; }, layer: { on: (arg0: string, arg1: () => void) => void; }) => {
+          onEachFeature: (feature: { properties: { name: any;code:any; }; }, layer: { on: (arg0: string, arg1: () => void) => void; }) => {
             layer.on('click', () => {
-              alert(`Clicked on: ${feature.properties.name}`);
+              this.http.get('http://localhost:8080/translate-hello',{responseType: 'text', params:{cc:feature.properties.code}}).subscribe({
+                next(value) {
+                  alert(`Hello in: ${feature.properties.name} is ${value}`);
+                },
+                error(err) {
+                  console.log("Error in transaltion: ")
+                  console.log(err);
+                  alert("Failed to get the translation.")
+                },
+              })
+              
             });
           },
         }).addTo(this.map);
+        //this.map.eachLayer(l => console.log(l))
+
       });
     });
   }
-  /*
-  @ViewChild('google-map') map: GoogleMap = new GoogleMap();
-
-  constructor() {} //private http: HttpClient
-
-  ngOnInit() {
-    //this.loadCountryDataFromBackend();
-  }
-
-  loadCountryDataFromBackend() {
-    /*this.http.get<any[]>('http://your-backend.com/api/countries').subscribe((data) => {
-      data.forEach((country) => {
-        const geoJsonFeature = {
-          type: 'Feature',
-          properties: {
-            NAME: country.name,
-            ISO_A2: country.code,
-          },
-          geometry: {
-            type: 'Polygon',
-            coordinates: [country.coordinates], // GeoJSON expects nested arrays
-          },
-        };
-
-        // Add feature to the data layer
-        this.map.data.addGeoJson(geoJsonFeature);
-      });
-
-      // Apply styling after adding features
-      this.styleCountries();
-    });
-  }
-
-  styleCountries() {
-    this.map.data.setStyle((feature) => {
-      const countryCode = feature.getProperty('ISO_A2');
-      const color = countryCode === 'BE' ? 'blue' : countryCode === 'FR' ? 'red' : 'gray';
-      return { fillColor: color, strokeWeight: 1, fillOpacity: 0.6 };
-    });
-
-    // Add click event
-    this.map.data.addListener('click', (event: { feature: { getProperty: (arg0: string) => any; }; }) => {
-      const countryName = event.feature.getProperty('NAME');
-      alert(`Clicked on: ${countryName}`);
-    });
-  }*/
 }
