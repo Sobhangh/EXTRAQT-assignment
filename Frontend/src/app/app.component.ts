@@ -31,7 +31,7 @@ export class AppComponent  implements OnInit {
   }
 
   private initMap() {
-    this.map = L.map(this.mapContainer.nativeElement).setView([20, 0], 2);
+    this.map = L.map(this.mapContainer.nativeElement).setView([50, 10], 4);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors',
@@ -60,16 +60,19 @@ export class AppComponent  implements OnInit {
             //return { color: code === 'BE' ? 'blue' : code === 'FR' ? 'red' : 'gray' };
             return {color:'blue'};
           },
-          onEachFeature: (feature: { properties: { name: any;code:any; }; }, layer: { on: (arg0: string, arg1: () => void) => void; }) => {
+          onEachFeature: (feature: { properties: { name: any;code:any; }; }, layer:any) => {
             layer.on('click', () => {
+              layer.setStyle({ color: 'red' });
               this.http.get('http://localhost:8080/translate-hello',{responseType: 'text', params:{cc:feature.properties.code}}).subscribe({
                 next(value) {
                   alert(`Hello in: ${feature.properties.name} is ${AppComponent.decodeHtml(value)}`);
+                  layer.setStyle({ color: 'blue' });
                 },
                 error(err) {
                   console.log("Error in transaltion: ")
                   console.log(err);
                   alert("Failed to get the translation.")
+                  layer.setStyle({ color: 'blue' });
                 },
               })
               
