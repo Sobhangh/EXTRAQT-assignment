@@ -11,14 +11,11 @@ import proj4 from 'proj4';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, HttpClientModule],
+  imports: [CommonModule, HttpClientModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent  implements OnInit {
-  title = 'Frontend';
-  center = { lat: 20, lng: 0 };
-  zoom = 2;
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef;
   private map!: L.Map;
 
@@ -40,50 +37,47 @@ export class AppComponent  implements OnInit {
 
   private loadCountryDataFromBackend() {
     this.http.get<Country[]>('http://localhost:8080/get-countries').subscribe((data) => {
-      data.forEach((country) => {
-        console.log(country);
-        const geoJsonFeature : GeoJSON.Feature   = {
-          type: 'Feature',
-          properties: {
-            name: country.name,
-            code: country.code,
-          },
-          geometry: {
-            type: 'MultiPolygon',
-            coordinates: country.multipolygon, // GeoJSON expects nested arrays
-          },
-        };
-
-        L.geoJSON(geoJsonFeature, {
-          style: (feature) => {
-            //const code = feature?.properties?.code;
-            //return { color: code === 'BE' ? 'blue' : code === 'FR' ? 'red' : 'gray' };
-            return {color:'blue'};
-          },
-          onEachFeature: (feature: { properties: { name: any;code:any; }; }, layer:any) => {
-            layer.on('click', () => {
-              layer.setStyle({ color: 'red' });
-              this.http.get('http://localhost:8080/translate-hello',{responseType: 'text', params:{cc:feature.properties.code}}).subscribe({
-                next(value) {
-                  alert(`Hello in: ${feature.properties.name} is ${AppComponent.decodeHtml(value)}`);
-                  layer.setStyle({ color: 'blue' });
-                },
-                error(err) {
-                  console.log("Error in transaltion: ")
-                  console.log(err);
-                  alert("Failed to get the translation.")
-                  layer.setStyle({ color: 'blue' });
-                },
-              })
-              
+      const geoJsonFeatures: GeoJSON.Feature[] = data.map((country) => ({
+        type: 'Feature',
+        properties: {
+          name: country.name,
+          code: country.code,
+        },
+        geometry: {
+          type: 'MultiPolygon',
+          coordinates: country.multipolygon, // GeoJSON expects nested arrays
+        },
+      }));
+  
+      const geoJsonLayer = L.geoJSON(geoJsonFeatures, {
+        style: (feature) => {
+          return { color: 'blue' };
+        },
+        onEachFeature: (feature: any, layer: any) => {
+          layer.on('click', () => {
+            layer.setStyle({ color: 'red' });
+            this.http.get('http://localhost:8080/translate-hello', {
+              responseType: 'text',
+              params: { cc: feature.properties.code }
+            }).subscribe({
+              next(value) {
+                alert(`In ${feature.properties.name} people greet by ${AppComponent.decodeHtml(value)}`);
+                layer.setStyle({ color: 'blue' });
+              },
+              error(err) {
+                console.log("Error in translation:", err);
+                alert("Failed to get the translation.");
+                layer.setStyle({ color: 'blue' });
+              },
             });
-          },
-        }).addTo(this.map);
-        //this.map.eachLayer(l => console.log(l))
-
+          });
+        },
       });
+  
+      geoJsonLayer.addTo(this.map); // ✅ Add all features at once
     });
   }
+  
 
   static decodeHtml(html: string): string {
     const doc = new DOMParser().parseFromString(html, "text/html");
