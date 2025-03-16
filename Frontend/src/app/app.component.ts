@@ -64,7 +64,7 @@ export class AppComponent  implements OnInit {
             layer.on('click', () => {
               this.http.get('http://localhost:8080/translate-hello',{responseType: 'text', params:{cc:feature.properties.code}}).subscribe({
                 next(value) {
-                  alert(`Hello in: ${feature.properties.name} is ${value}`);
+                  alert(`Hello in: ${feature.properties.name} is ${AppComponent.decodeHtml(value)}`);
                 },
                 error(err) {
                   console.log("Error in transaltion: ")
@@ -80,5 +80,10 @@ export class AppComponent  implements OnInit {
 
       });
     });
+  }
+
+  static decodeHtml(html: string): string {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.documentElement.textContent || "";
   }
 }
