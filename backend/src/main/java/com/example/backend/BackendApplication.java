@@ -66,9 +66,6 @@ public class BackendApplication {
 				List<List<List<List<Double>>>> multipolygon = parseMultiPolygon(wkt);
 
 				countries.add(new Country(name, code, multipolygon));
-				if(countries.get(countries.size()-1).code() == "fr"){
-					logger.info(countries.get(countries.size()-1).toString());
-				}
 			}
 			logger.info(countries.get(1).toString());
 		};

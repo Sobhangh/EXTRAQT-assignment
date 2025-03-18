@@ -6,7 +6,7 @@ import { RouterOutlet } from '@angular/router';
 import * as L from 'leaflet';
 import {Country} from './country';
 import * as GeoJSON from 'geojson';
-import proj4 from 'proj4';
+
 
 @Component({
   selector: 'app-root',
@@ -19,7 +19,7 @@ export class AppComponent  implements OnInit {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef;
   private map!: L.Map;
 
-  constructor(private http: HttpClient) {} //
+  constructor(private http: HttpClient) {} 
   
 
   ngOnInit() {
@@ -45,7 +45,7 @@ export class AppComponent  implements OnInit {
         },
         geometry: {
           type: 'MultiPolygon',
-          coordinates: country.multipolygon, // GeoJSON expects nested arrays
+          coordinates: country.multipolygon, 
         },
       }));
   
@@ -74,7 +74,7 @@ export class AppComponent  implements OnInit {
         },
       });
   
-      geoJsonLayer.addTo(this.map); // ✅ Add all features at once
+      geoJsonLayer.addTo(this.map); // Add all features at once
     });
   }
   
